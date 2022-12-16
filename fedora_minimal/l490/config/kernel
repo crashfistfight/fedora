@@ -1,0 +1,40 @@
+#! /usr/bin/env bash
+
+user_watches() {
+# set max_user_watches
+  sudo tee /etc/sysctl.d/40-max-user-watches.conf > /dev/null <<EOF
+fs.inotify.max_user_watches=524288
+EOF
+}
+
+blacklist_snd_pcsp() {
+# blacklist pc speaker
+  sudo tee /etc/modprobe.d/blacklist.conf > /dev/null <<EOF
+blacklist snd_pcsp
+EOF
+}
+
+set_tcc_offset() {
+# systemd service
+  sudo tee /etc/systemd/system/tcc-offset.service > /dev/null <<EOF
+[Unit]
+Description=Set tcc_offset to 5
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin echo "5" > /sys/devices/pci0000\:00/0000\:00\:04.0/tcc_offset_degree_celsius
+
+[Install]
+WantedBy=default.target
+EOF
+
+# systemd
+sudo systemctl enable --now tcc-offset.service
+}
+
+kernel() {
+  user_watches
+  blacklist_snd_pcsp
+  set_tcc_offset
+}

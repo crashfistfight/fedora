@@ -1,0 +1,21 @@
+#! /usr/bin/env bash
+
+display() {
+# systemd service
+  sudo tee /etc/systemd/system/poweroff-display.service > /dev/null <<EOF
+[Unit]
+Description=Poweroff display after 1 minute
+
+[Service]
+Type=simple
+Environment=TERM=linux
+ExecStart=/usr/bin/sh -c "setterm --blank 1 >/dev/tty1 </dev/tty1"
+
+[Install]
+WantedBy=default.target
+EOF
+
+# systemd
+sudo systemctl daemon-reload
+sudo systemctl enable --now poweroff-display.service
+}

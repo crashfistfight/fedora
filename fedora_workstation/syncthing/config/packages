@@ -1,0 +1,17 @@
+#! /usr/bin/env bash
+
+packages() {
+#vars
+  local packages=(
+    "vim"
+    "dnf-automatic"
+    "syncthing"
+    "policycoreutils-python-utils"
+    "snapper"
+  )
+# upgrade system
+  sudo dnf upgrade --assumeyes
+
+# install packages
+  sudo dnf install --assumeyes "${packages[@]}"
+}

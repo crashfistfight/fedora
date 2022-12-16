@@ -1,0 +1,10 @@
+#! /usr/bin/env bash
+
+dnf_automatic() {
+# apply updates
+  sudo sed -i "s@^apply_updates = .*@apply_updates = yes@" /etc/dnf/automatic.conf
+
+# systemd
+  sudo systemctl daemon-reload
+  sudo systemctl enable --now dnf-automatic.timer
+}

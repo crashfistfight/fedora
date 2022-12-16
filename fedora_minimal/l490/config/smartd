@@ -1,0 +1,11 @@
+#! /usr/bin/env bash
+
+smartd(){
+# create config
+    sudo tee /etc/smartmontools/smartd.conf > /dev/null <<EOF
+DEVICESCAN -a -o on -S on -n standby,q -s (S/../.././02|L/../../7/03) -m root
+EOF
+
+#systemd
+  sudo systemctl enable --now smartd.service
+}

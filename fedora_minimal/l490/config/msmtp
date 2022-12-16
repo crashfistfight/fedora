@@ -1,0 +1,58 @@
+#! /usr/bin/env bash
+
+msmtp() {
+# vars
+  local smtp_server=""
+  local smtp_port=""
+  local starttls="on"
+  local email_username=""
+  local email_password=""
+  local email_adress=""
+  local msmtp_account_name=""
+  local email_sendto_address=""
+
+# create config
+  sudo tee /etc/msmtprc > /dev/null <<EOF
+# Set default values for all following accounts.
+defaults
+auth           on
+tls            on
+tls_trust_file /etc/ssl/certs/ca-certificates.crt
+logfile        ~/.msmtp.log
+
+# account
+account        $msmtp_account_name
+host           $smtp_server
+port           $smtp_port
+tls_starttls   $starttls
+from           $email_adress
+user           $email_username
+password       $email_password
+
+# Set default account
+account default: $msmtp_account_name
+
+# Use aliases
+aliases        /etc/aliases
+EOF
+
+# set mta
+  sudo tee /etc/mail.rc > /dev/null <<EOF
+set mta=/usr/bin/msmtp
+EOF
+
+# create aliases
+  sudo tee /etc/msmtprc > /dev/null <<EOF
+mailer-daemon:  postmaster
+postmaster:     root
+decode:         root
+root:           $email_sendto_address
+default:        $email_sendto_address
+EOF
+
+# fix selinux permissions
+  sudo ausearch -c 'sendmail' --raw | sudo audit2allow -M my-sendmail
+  sudo semodule -X 300 -i my-sendmail.pp
+  sudo rm my-sendmail.{pp,te}
+  sudo setsebool -P nis_enabled 1
+}

@@ -1,0 +1,10 @@
+#! /usr/bin/env bash
+
+cockpit() {
+# systemd
+  sudo systemctl enable --now cockpit.socket
+  sudo systemctl enable --now libvirtd.service
+# firewalld
+  sudo firewall-cmd --add-service=cockpit --permanent
+  sudo firewall-cmd --reload
+}

@@ -1,0 +1,45 @@
+#! /usr/bin/env bash
+
+ssh() {
+# vars
+  local ssh_port="60022"
+  local ssh_authorized_keys=(
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFVzUT3GopDPlixGUyTFnKSMHn6P9KU4R07fOqMRICPw crashfistfight@l490"
+  )
+
+# create ssh dir
+  mkdir --mode=700 "$HOME"/.ssh
+
+# add keys
+  tee "$HOME"/.ssh/authorized_keys > /dev/null <<EOF
+$(printf "%s\n" "${ssh_authorized_keys[@]}")
+EOF
+  chmod 600 "$HOME"/.ssh/authorized_keys
+
+# create config
+  sudo tee /etc/ssh/sshd_config.d/10-custom.conf > /dev/null <<EOF
+Port $ssh_port
+PermitRootLogin no
+PubkeyAuthentication yes
+PasswordAuthentication no
+X11Forwarding no
+EOF
+
+# firewalld
+  sudo semanage port -a -t ssh_port_t -p tcp "$ssh_port"
+  sudo firewall-cmd --add-port="$ssh_port"/tcp --permanent
+  sudo firewall-cmd --remove-service=ssh --permanent
+  sudo firewall-cmd --reload
+
+# systemd service
+  sudo mkdir /etc/systemd/system/sshd.socket.d
+  sudo tee /etc/systemd/system/sshd.socket.d/override.conf > /dev/null <<EOF
+[Socket]
+ListenStream=
+ListenStream=$ssh_port
+EOF
+# systemd
+  sudo systemctl daemon-reload
+  sudo systemctl disable --now sshd.service
+  sudo systemctl enable --now sshd.socket
+}

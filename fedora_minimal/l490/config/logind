@@ -1,0 +1,10 @@
+#! /usr/bin/env bash
+
+logind() {
+# disable suspend on lid switch
+  sudo tee /etc/systemd/logind.conf.d/lid.conf > /dev/null <<EOF
+[Login]
+HandleLidSwitch=ignore
+HandleLidSwitchExternalPower=ignore
+EOF
+}

@@ -1,0 +1,26 @@
+#! /usr/bin/env bash
+
+packages() {
+#vars
+  local packages=(
+    "htop"
+    "dnf-plugins-core"
+    "bash-completion"
+    "sqlite"
+    "vim"
+    "dnf-automatic"
+    "syncthing"
+    "policycoreutils-python-utils"
+    "msmtp"
+    "s-nail"
+    "cockpit"
+    "cockpit-machines"
+    "cockpit-selinux"
+    "smartmontools"
+  )
+# upgrade system
+  sudo dnf upgrade --assumeyes
+
+# install packages
+  sudo dnf install --assumeyes "${packages[@]}"
+}

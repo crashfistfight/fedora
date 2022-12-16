@@ -1,0 +1,79 @@
+#! /usr/bin/env bash
+
+snapper() {
+# vars
+  min_age="1800"
+  hourly="24"
+  daily="7"
+  weekly="4"
+  monthly="12"
+  yearly="1"
+
+# create snapshot volume
+  if [ ! -d /home/.snapshots ]; then
+    sudo btrfs subvolume create /home/.snapshots
+  fi
+
+# create snapper config
+  sudo mkdir -p /etc/snapper/configs
+  sudo tee /etc/snapper/configs/home > /dev/null <<EOF
+# subvolume to snapshot
+SUBVOLUME="/home"
+
+# filesystem type
+FSTYPE="btrfs"
+
+# create hourly snapshots
+TIMELINE_CREATE="yes"
+
+# cleanup hourly snapshots after some time
+TIMELINE_CLEANUP="yes"
+
+# limits for timeline cleanup
+TIMELINE_MIN_AGE="$min_age"
+TIMELINE_LIMIT_HOURLY="$hourly"
+TIMELINE_LIMIT_DAILY="$daily"
+TIMELINE_LIMIT_WEEKLY="$weekly"
+TIMELINE_LIMIT_MONTHLY="$monthly"
+TIMELINE_LIMIT_YEARLY="$yearly"
+
+# cleanup empty pre-post-pairs
+EMPTY_PRE_POST_CLEANUP="yes"
+EOF
+
+  sudo mkdir -p /etc/sysconfig
+  sudo tee /etc/sysconfig/snapper > /dev/null <<EOF
+# List of snapper configurations.
+SNAPPER_CONFIGS="home"
+EOF
+
+# systemd timer
+  sudo tee /etc/systemd/system/snapper-cleanup.timer > /dev/null <<EOF
+[Unit]
+Description=Hourly cleanup of snapper snapshots
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+EOF
+
+  sudo tee /etc/systemd/system/snapper-timeline.timer > /dev/null <<EOF
+[Unit]
+Description=Timeline of Snapper Snapshots
+Documentation=man:snapper(8) man:snapper-configs(5)
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+EOF
+
+# systemd
+  sudo systemctl daemon-reload
+  sudo systemctl enable snapper-cleanup.timer snapper-timeline.timer
+}

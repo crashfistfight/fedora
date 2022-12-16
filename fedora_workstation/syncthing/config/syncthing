@@ -1,0 +1,6 @@
+#! /usr/bin/env bash
+
+syncthing() {
+# systemd
+  sudo systemctl enable --now syncthing@"$USER".service
+}

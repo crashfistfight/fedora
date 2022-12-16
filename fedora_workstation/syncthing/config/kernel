@@ -1,0 +1,12 @@
+#! /usr/bin/env bash
+
+user_watches() {
+# set max_user_watches
+  sudo tee /etc/sysctl.d/40-max-user-watches.conf > /dev/null <<EOF
+fs.inotify.max_user_watches=524288
+EOF
+}
+
+kernel() {
+  user_watches
+}
