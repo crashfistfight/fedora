@@ -15,6 +15,7 @@ host() {
   vim
   ssh
   syncthing
+  snapper
 }
 
 # run config
