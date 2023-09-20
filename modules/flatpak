@@ -1,0 +1,67 @@
+#! /usr/bin/env bash
+
+# shellcheck disable=SC2154
+
+flatpak_(){
+# install flakpaks
+  local default_flatpaks=(
+    "org.gnome.Geary"
+    "org.gnome.Evince"
+    "org.gnome.Logs"
+    "org.gnome.Calendar"
+    "org.gnome.Calculator"
+    "org.gnome.Loupe"
+    "com.github.tchx84.Flatseal"
+    "org.mozilla.firefox"
+    "org.gnome.Totem"
+    "org.gnome.Firmware"
+    "org.gnome.seahorse.Application"
+    "org.freedesktop.Platform.ffmpeg-full/x86_64/21.08"
+
+)
+
+  flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+  flatpak install  --noninteractive --assumeyes --or-update "${default_flatpaks[@]}" "${flatpaks[@]}"
+
+# auto update flatpaks
+  local packages=(
+    "dbus-x11"
+  )
+  dnf install --assumeyes "${packages[@]}"
+
+  tee /etc/systemd/system/flatpak-automatic.service > /dev/null <<EOF
+[Unit]
+Description=Flatpak - run flatpak update --assumeyes
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=dbus-launch flatpak update --noninteractive --assumeyes
+Restart=on-failure
+RestartSec=60s
+EOF
+
+  tee /etc/systemd/system/flatpak-automatic.timer > /dev/null <<EOF
+[Unit]
+Description=Flatpak - trigger for flatpak-automatic.service
+
+[Timer]
+OnBootSec=1h
+OnUnitInactiveSec=1d
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+EOF
+
+# enable
+  systemctl daemon-reload
+  systemctl enable --now flatpak-automatic.timer
+
+#flatpak overrides
+  flatpak override --socket=wayland --env=MOZ_ENABLE_WAYLAND=1 org.mozilla.firefox
+}
+
+flatpak_

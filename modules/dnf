@@ -1,0 +1,50 @@
+#! /usr/bin/env bash
+
+dnf_(){
+# remove packages
+  local packages=(
+    "gnome-maps"
+    "gnome-photos"
+    "gnome-text-editor"
+    "simple-scan"
+    "gnome-software"
+    "PackageKit"
+    "gnome-boxes"
+    "evince"
+    "eog"
+    "gnome-connections"
+    "gnome-calendar"
+    "gnome-logs"
+    "rhythmbox"
+    "gnome-calculator"
+    "gnome-clocks"
+    "gnome-weather"
+    "gnome-tour"
+    "yelp"
+    "cheese"
+    "totem"
+    "baobab"
+    "firefox"
+    "gnome-characters"
+    "gnome-font-viewer"
+    "libreoffice*"
+  )
+
+  dnf remove "${packages[@]}"
+
+# install packages
+  local packages=(
+    "dnf-automatic"
+    "htop"
+  )
+
+  dnf install --assumeyes "${packages[@]}"
+
+# auto update packages
+  sed --in-place "s@^apply_updates = .*@apply_updates = yes@" /etc/dnf/automatic.conf
+
+  systemctl daemon-reload
+  systemctl enable --now dnf-automatic.timer
+}
+
+dnf_

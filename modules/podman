@@ -1,0 +1,58 @@
+#! /usr/bin/env bash
+
+# shellcheck disable=SC2154
+
+podman_() {
+# create user
+
+  local podman_path="/home/$podman_user"
+
+  if [[ ! "$podman_user" = "$(id -un 1000)" ]]; then
+    useradd -m "$podman_user"
+    tee --append "$podman_path"/.bashrc > /dev/null <<EOF
+export XDG_RUNTIME_DIR=/run/user/"$(id -u)"
+EOF
+  fi
+
+  loginctl enable-linger "$podman_user"
+
+# create config
+  mkdir --parents "$podman_path"{/.config/containers,/.config/systemd/user}
+
+  tee "$podman_path"/.config/containers/containers.conf > /dev/null <<EOF
+tz = "local"
+EOF
+
+  tee "$podman_path"/.config/systemd/user/podman-auto-update.service > /dev/null <<EOF
+[Unit]
+Description=Podman auto-update service
+Documentation=man:podman-auto-update(1)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/podman auto-update
+ExecStartPost=/usr/bin/podman image prune -f
+
+[Install]
+WantedBy=default.target
+EOF
+
+  tee "$podman_path"/.config/systemd/user/podman-auto-update.timer > /dev/null <<EOF
+[Unit]
+Description=Podman auto-update timer
+
+[Timer]
+OnCalendar=daily
+RandomizedDelaySec=900
+Persistent=true
+
+  [Install]
+WantedBy=timers.target
+EOF
+
+  chown --recursive "$podman_user":"$podman_user" "$podman_path"
+}
+
+podman_

@@ -1,0 +1,48 @@
+#! /usr/bin/env bash
+
+# shellcheck disable=SC2154
+
+ssh_() {
+# create config
+
+  local home
+        home="/home/$(id -un 1000)"
+
+  mkdir --mode=700 "$home"/.ssh
+
+  tee "$home"/.ssh/authorized_keys > /dev/null <<EOF
+$(printf "%s\n" "${ssh_auth_keys[@]}")
+EOF
+  chmod 600 "$home"/.ssh/authorized_keys
+
+  chown --recursive "$(id -un 1000)":"$(id -un 1000)" /home/"$(id -un 1000)"
+
+  tee /etc/ssh/sshd_config.d/10-custom.conf > /dev/null <<EOF
+Port ${ssh_port} 
+PermitRootLogin no
+PubkeyAuthentication yes
+PasswordAuthentication no
+X11Forwarding no
+EOF
+
+  semanage port -a -t ssh_port_t -p tcp "$ssh_port"
+
+  mkdir /etc/systemd/system/sshd.socket.d
+  tee /etc/systemd/system/sshd.socket.d/override.conf > /dev/null <<EOF
+[Socket]
+ListenStream=
+ListenStream=${ssh_port}
+EOF
+
+# enable
+  systemctl daemon-reload
+  systemctl disable --now sshd.service
+  systemctl enable --now sshd.socket
+
+# firewall
+  firewall-cmd --add-port="$ssh_port"/tcp --permanent --quiet
+  firewall-cmd --remove-service=ssh --permanent --quiet
+  firewall-cmd --reload --quiet
+}
+
+ssh_

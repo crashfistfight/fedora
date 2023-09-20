@@ -1,0 +1,25 @@
+#! /usr/bin/env bash
+
+# shellcheck disable=SC2034
+# shellcheck source=/dev/null
+
+workstation_() {
+# load modules
+  modules=(
+    'hostnamectl'
+    'bash_prompt'
+    'dnf'
+    'snapper'
+    'flatpak'
+    'vim'
+    'syncthing'
+    'gnome'
+    'podman'
+    )
+
+  for i in "${modules[@]}"; do
+    source "$PWD"/../modules/"$i"
+  done
+}
+
+workstation_

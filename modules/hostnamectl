@@ -1,0 +1,8 @@
+#! /usr/bin/env bash
+
+hostnamectl_(){
+# set hostname
+  hostnamectl hostname "$(basename "$0")"
+}
+
+hostnamectl_

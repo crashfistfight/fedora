@@ -1,0 +1,24 @@
+#! /usr/bin/env bash
+
+# shellcheck disable=SC2034
+# shellcheck source=/dev/null
+
+
+# set vars
+profile='workstation'
+
+flatpaks=(
+  "org.signal.Signal"
+  "com.visualstudio.code-oss"
+  "com.yubico.yubioath"
+  "org.chromium.Chromium"
+  "org.gimp.GIMP"
+  "org.gnome.Boxes"
+  "com.valvesoftware.Steam"
+  "org.libreoffice.LibreOffice"
+)
+
+podman_user='rico'
+
+# load profile
+source "$PWD"/../profiles/"$profile"

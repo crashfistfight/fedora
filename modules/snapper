@@ -1,0 +1,57 @@
+#! /usr/bin/env bash
+
+snapper_(){
+# create subvolume
+  if [ ! -d /home/.snapshots ]; then
+    btrfs subvolume create /home/.snapshots
+  fi
+
+# create config
+  mkdir --parents /etc/snapper/configs 
+  tee /etc/snapper/configs/home > /dev/null <<EOF
+# subvolume to snapshot
+SUBVOLUME="/home"
+
+# filesystem type
+FSTYPE="btrfs"
+
+# create hourly snapshots
+TIMELINE_CREATE="yes"
+
+# cleanup hourly snapshots after some time
+TIMELINE_CLEANUP="yes"
+
+# limits for timeline cleanup
+TIMELINE_MIN_AGE="1800"
+TIMELINE_LIMIT_HOURLY="24"
+TIMELINE_LIMIT_DAILY="3"
+TIMELINE_LIMIT_WEEKLY="0"
+TIMELINE_LIMIT_MONTHLY="0"
+TIMELINE_LIMIT_YEARLY="0"
+
+# cleanup empty pre-post-pairs
+EMPTY_PRE_POST_CLEANUP="yes"
+EOF
+
+  sed --in-place "s@^SNAPPER_CONFIGS=.*@SNAPPER_CONFIGS=\"home\"@" /etc/sysconfig/snapper
+
+  mkdir /etc/systemd/system/snapper-cleanup.timer.d
+  tee /etc/systemd/system/snapper-cleanup.timer.d/override.conf > /dev/null <<EOF
+[Timer]
+OnBootSec=
+OnUnitActiveSec=
+OnCalendar=hourly
+Persistent=true
+EOF
+  mkdir /etc/systemd/system/snapper-timeline.timer.d
+  tee /etc/systemd/system/snapper-timeline.timer.d/override.conf > /dev/null <<EOF
+[Timer]
+Persistent=True
+EOF
+
+# enable
+  systemctl daemon-reload
+  systemctl enable --now snapper-cleanup.timer snapper-timeline.timer
+}
+
+snapper_
