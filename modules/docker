@@ -11,16 +11,10 @@ docker_() {
   dnf install --assumeyes "${packages[@]}"
 
 # add user
-  useradd -m "$docker_user"
-
-# create group
-  groupadd docker
-  usermod --append --groups docker "$docker_user"
-  newgrp docker
+  useradd --create-home "$docker_user"
 
 # install docker
-  curl -fsSL https://get.docker.com -o get-docker.sh
-  sh get-docker.sh
+  bash <(curl -fsSL https://get.docker.com)
 
 # enable
   systemctl enable --now docker.service
