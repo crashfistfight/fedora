@@ -4,24 +4,13 @@
 
 flatpak_(){
 # install flakpaks
-  local default_flatpaks=(
-    "org.gnome.Geary"
-    "org.gnome.Evince"
-    "org.gnome.Logs"
-    "org.gnome.Calendar"
-    "org.gnome.Calculator"
-    "org.gnome.Loupe"
-    "com.github.tchx84.Flatseal"
-    "org.mozilla.firefox"
-    "org.gnome.Totem"
-    "org.gnome.Firmware"
-    "org.gnome.seahorse.Application"
-    "org.freedesktop.Platform.ffmpeg-full/x86_64/21.08"
-
-)
-
   flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-  flatpak install  --noninteractive --assumeyes --or-update "${default_flatpaks[@]}" "${flatpaks[@]}"
+
+  flatpak install --noninteractive --assumeyes --or-update "${default_flatpaks[@]}"
+
+  if [[ -n "$flatpaks" ]]; then
+    flatpak install --noninteractive --assumeyes --or-update "${flatpaks[@]}"
+  fi
 
 # auto update flatpaks
   local packages=(
@@ -60,8 +49,11 @@ EOF
   systemctl daemon-reload
   systemctl enable --now flatpak-automatic.timer
 
-#flatpak overrides
-  flatpak override --socket=wayland --env=MOZ_ENABLE_WAYLAND=1 org.mozilla.firefox
+# flatpak overrides
+# firefox
+  if [[ "${default_flatpaks[*]}" =~ 'firefox' ]]; then
+    flatpak override --socket=wayland --env=MOZ_ENABLE_WAYLAND=1 org.mozilla.firefox
+  fi
 }
 
 flatpak_

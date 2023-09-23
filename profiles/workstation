@@ -4,6 +4,50 @@
 # shellcheck source=/dev/null
 
 workstation_() {
+# set vars
+  removals=(
+    "gnome-maps"
+    "gnome-photos"
+    "gnome-text-editor"
+    "simple-scan"
+    "gnome-software"
+    "PackageKit"
+    "gnome-boxes"
+    "evince"
+    "eog"
+    "gnome-connections"
+    "gnome-calendar"
+    "gnome-logs"
+    "rhythmbox"
+    "gnome-calculator"
+    "gnome-clocks"
+    "gnome-weather"
+    "gnome-tour"
+    "yelp"
+    "cheese"
+    "totem"
+    "baobab"
+    "firefox"
+    "gnome-characters"
+    "gnome-font-viewer"
+    "libreoffice*"
+  )
+
+  default_flatpaks=(
+    "org.gnome.Geary"
+    "org.gnome.Evince"
+    "org.gnome.Logs"
+    "org.gnome.Calendar"
+    "org.gnome.Calculator"
+    "org.gnome.Loupe"
+    "com.github.tchx84.Flatseal"
+    "org.mozilla.firefox"
+    "org.gnome.Totem"
+    "org.gnome.Firmware"
+    "org.gnome.seahorse.Application"
+    "org.freedesktop.Platform.ffmpeg-full/x86_64/21.08"
+)
+
 # load modules
   modules=(
     'hostnamectl'

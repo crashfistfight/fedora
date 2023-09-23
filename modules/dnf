@@ -1,36 +1,12 @@
 #! /usr/bin/env bash
 
+# shellcheck disable=SC2154
+
 dnf_(){
 # remove packages
-  local packages=(
-    "gnome-maps"
-    "gnome-photos"
-    "gnome-text-editor"
-    "simple-scan"
-    "gnome-software"
-    "PackageKit"
-    "gnome-boxes"
-    "evince"
-    "eog"
-    "gnome-connections"
-    "gnome-calendar"
-    "gnome-logs"
-    "rhythmbox"
-    "gnome-calculator"
-    "gnome-clocks"
-    "gnome-weather"
-    "gnome-tour"
-    "yelp"
-    "cheese"
-    "totem"
-    "baobab"
-    "firefox"
-    "gnome-characters"
-    "gnome-font-viewer"
-    "libreoffice*"
-  )
-
-  dnf remove "${packages[@]}"
+  if [[ -n "$removals" ]]; then
+    dnf remove "${removals[@]}"
+  fi
 
 # install packages
   local packages=(
