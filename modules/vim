@@ -1,6 +1,13 @@
 #! /usr/bin/env bash
 
 vim_() {
+# install
+local packages=(
+  'vim'
+)
+
+  dnf install --assumeyes "${packages[@]}"
+
 # create config
   tee /etc/vimrc > /dev/null <<EOF
 set autoindent
