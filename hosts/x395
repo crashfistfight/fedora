@@ -5,23 +5,23 @@
 
 host_(){
 # set vars
-profile='workstation'
+  profile='workstation'
 
-flatpaks=(
-  "org.signal.Signal"
-  "com.visualstudio.code-oss"
-  "com.yubico.yubioath"
-  "org.chromium.Chromium"
-  "org.gimp.GIMP"
-  "org.gnome.Boxes"
-  "com.valvesoftware.Steam"
-  "org.libreoffice.LibreOffice"
-)
+  flatpaks=(
+    "org.signal.Signal"
+    "com.visualstudio.code-oss"
+    "com.yubico.yubioath"
+    "org.chromium.Chromium"
+    "org.gimp.GIMP"
+    "org.gnome.Boxes"
+    "com.valvesoftware.Steam"
+    "org.libreoffice.LibreOffice"
+  )
 
-podman_user='rico'
+  podman_user='rico'
 
 # load profile
-source "$PWD"/../profiles/"$profile"
+  source "$PWD"/../profiles/"$profile"
 }
 
 host_
