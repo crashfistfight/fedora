@@ -9,12 +9,16 @@ dnf_(){
   fi
 
 # install packages
-  local packages=(
+  local core_packages=(
     "dnf-automatic"
     "htop"
   )
 
-  dnf install --assumeyes "${packages[@]}"
+  dnf install --assumeyes "${core_packages[@]}"
+
+  if [[ -n "$default_packages" ]]; then
+    dnf install --assumeyes "${default_packages[@]}"
+  fi
 
 # auto update packages
   sed --in-place "s@^apply_updates = .*@apply_updates = yes@" /etc/dnf/automatic.conf
