@@ -10,14 +10,14 @@ default_packages=(
 )
 
 # load modules
-  modules=(
+  lxc_modules=(
     'hostnamectl'
     'bash_prompt'
     'dnf'
     'vim'
     )
 
-  for i in "${modules[@]}"; do
+  for i in "${lxc_modules[@]}"; do
     source "$PWD"/../modules/"$i"
   done
 }

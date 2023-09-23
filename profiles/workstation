@@ -49,7 +49,7 @@ workstation_() {
 )
 
 # load modules
-  modules=(
+  workstation_modules=(
     'hostnamectl'
     'bash_prompt'
     'dnf'
@@ -61,7 +61,7 @@ workstation_() {
     'podman'
     )
 
-  for i in "${modules[@]}"; do
+  for i in "${workstation_modules[@]}"; do
     source "$PWD"/../modules/"$i"
   done
 }
