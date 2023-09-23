@@ -1,0 +1,30 @@
+#! /usr/bin/env bash
+
+# shellcheck disable=SC2154
+
+docker_() {
+# intall packages
+  local packages=(
+    'curl'
+  )
+
+  dnf install --assumeyes "${packages[@]}"
+
+# add user
+  useradd -m "$docker_user"
+
+# create group
+  groupadd docker
+  usermod --append --groups docker "$docker_user"
+  newgrp docker
+
+# install docker
+  curl -fsSL https://get.docker.com -o get-docker.sh
+  sh get-docker.sh
+
+# enable
+  systemctl enable --now docker.service
+
+}
+
+docker_
