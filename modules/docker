@@ -3,22 +3,36 @@
 # shellcheck disable=SC2154
 
 docker_() {
-# intall packages
+# install packages
   local packages=(
     'curl'
+    'dnf-plugins-core'
   )
 
   dnf install --assumeyes "${packages[@]}"
 
+# install repo
+  dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+
 # add user
-  useradd --create-home "$docker_user"
+  useradd --create-home --no-user-group "$docker_user"
 
 # install docker
-  bash <(curl -fsSL https://get.docker.com)
+  local docker_packages=(
+    'docker-ce'
+    'docker-ce-cli'
+    'containerd.io'
+    'docker-buildx-plugin'
+    'docker-compose-plugin'
+  )
+
+  dnf install --assumeyes "${docker_packages[@]}"
+
+# add user to group
+usermod -aG docker "$docker_user"
 
 # enable
-  systemctl enable --now docker.service
-
+  systemctl enable --now docker.service containerd.service
 }
 
 docker_
