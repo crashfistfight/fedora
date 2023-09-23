@@ -3,7 +3,7 @@
 # shellcheck disable=SC2034
 # shellcheck source=/dev/null
 
-
+host_(){
 # set vars
 profile='workstation'
 
@@ -22,3 +22,6 @@ podman_user='rico'
 
 # load profile
 source "$PWD"/../profiles/"$profile"
+}
+
+host_
