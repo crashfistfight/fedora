@@ -1,0 +1,25 @@
+#! /usr/bin/env bash
+
+# shellcheck disable=SC2034
+# shellcheck source=/dev/null
+
+host_(){
+# set vars
+  profile='lxc'
+
+  docker_user='docker'
+
+# load profile
+  source "$PWD"/../profiles/"$profile"
+
+# load extra modules
+  modules=(
+    'docker'
+    )
+
+  for i in "${modules[@]}"; do
+    source "$PWD"/../modules/"$i"
+  done
+}
+
+host_
