@@ -5,7 +5,9 @@
 
 lxc_() {
 # set vars
-
+default_packages=(
+  'firewalld'
+)
 
 # load modules
   modules=(
