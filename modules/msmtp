@@ -1,0 +1,47 @@
+#! /usr/bin/env bash
+
+# shellcheck disable=SC2154
+
+msmtp_() {
+# install packages
+  local packages=(
+  'msmtp'
+  's-nail'
+  )
+
+  dnf install --assumeyes "${packages[@]}"
+
+#create config
+  tee /etc/msmtprc > /dev/null <<EOF
+# Set default values for all following accounts.
+defaults
+auth           on
+tls            on
+tls_trust_file /etc/ssl/certs/ca-certificates.crt
+logfile        ~/.msmtp.log
+
+# account
+account        default
+host           ${email_smtp_server}
+port           587
+tls_starttls   on
+from           ${email_from}
+user           ${email_user}
+password       ${email_password}
+
+# Use aliases
+aliases        /etc/aliases
+EOF
+
+  tee /etc/aliases > /dev/null <<EOF
+mailer-daemon:  postmaster
+postmaster:     root
+decode:         root
+root:           ${email_sendto}
+default:        ${email_sendto}
+EOF
+
+  echo 1 | alternatives --config mta
+}
+
+msmtp_
