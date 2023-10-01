@@ -1,0 +1,19 @@
+#! /usr/bin/env bash
+
+# shellcheck disable=SC2034
+# shellcheck source=/dev/null
+
+host_(){
+# set vars
+  profile='lxc'
+
+  packages=(
+    'samba'
+  )
+
+# set profile
+  source "$PWD"/../profiles/"$profile"
+}
+
+host_
+

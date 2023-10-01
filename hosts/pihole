@@ -1,0 +1,24 @@
+#! /usr/bin/env bash
+
+# shellcheck disable=SC2034
+# shellcheck source=/dev/null
+
+host_(){
+# set vars
+  profile='lxc'
+
+# set profile
+  source "$PWD"/../profiles/"$profile"
+
+# load modules
+  modules=(
+    'pihole'
+  )
+
+  for i in "${modules[@]}"; do
+    source "$PWD"/../modules/"$i"
+  done
+}
+
+host_
+
