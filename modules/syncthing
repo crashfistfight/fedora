@@ -3,7 +3,8 @@
 syncthing_(){
 # install packages
   local packages=(
-    "syncthing"
+    'syncthing'
+    'firewalld'
   )
 
    dnf install --assumeyes "${packages[@]}"
@@ -13,11 +14,10 @@ syncthing_(){
 fs.inotify.max_user_watches=524288
 EOF
 
+# enable 
+  systemctl enable --now syncthing@"$USER".service firewalld.service
   firewall-cmd --add-service=syncthing --permanent --quiet
   firewall-cmd --reload --quiet
-
-# enable 
-  systemctl enable --now syncthing@"$USER".service
 }
 
 syncthing_

@@ -3,29 +3,39 @@
 # shellcheck disable=SC2154
 
 ssh_() {
+# set vars
+  local : "${ssh_port:=22}"
+
+# install
+  local packages=(
+    'openssh-server'
+    'firewalld'
+    )
+
+  dnf install --assumeyes "${packages[@]}"
+
 # create config
 
-  local home
-        home="/home/$(id -un 1000)"
 
-  mkdir --mode=700 "$home"/.ssh
+  mkdir --mode=700 .ssh
 
-  tee "$home"/.ssh/authorized_keys > /dev/null <<EOF
+  tee .ssh/authorized_keys > /dev/null <<EOF
 $(printf "%s\n" "${ssh_auth_keys[@]}")
 EOF
-  chmod 600 "$home"/.ssh/authorized_keys
-
-  chown --recursive "$(id -un 1000)":"$(id -un 1000)" /home/"$(id -un 1000)"
+  chmod 600 .ssh/authorized_keys
 
   tee /etc/ssh/sshd_config.d/10-custom.conf > /dev/null <<EOF
+
 Port ${ssh_port} 
-PermitRootLogin no
+PermitRootLogin yes
 PubkeyAuthentication yes
 PasswordAuthentication no
 X11Forwarding no
 EOF
 
-  semanage port -a -t ssh_port_t -p tcp "$ssh_port"
+  if [[ ! "$profile" = "lxc" ]]; then
+    semanage port -a -t ssh_port_t -p tcp "$ssh_port"
+  fi
 
   mkdir /etc/systemd/system/sshd.socket.d
   tee /etc/systemd/system/sshd.socket.d/override.conf > /dev/null <<EOF
@@ -37,12 +47,13 @@ EOF
 # enable
   systemctl daemon-reload
   systemctl disable --now sshd.service
-  systemctl enable --now sshd.socket
+  systemctl enable --now sshd.socket firewalld.service
 
-# firewall
   firewall-cmd --add-port="$ssh_port"/tcp --permanent --quiet
-  firewall-cmd --remove-service=ssh --permanent --quiet
-  firewall-cmd --reload --quiet
+  if [[ ! "$ssh_port" = "22" ]]; then
+    firewall-cmd --remove-service=ssh --permanent --quiet
+  fi
+  firewall-cmd --reload
 }
 
 ssh_

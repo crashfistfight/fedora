@@ -1,6 +1,7 @@
 #! /usr/bin/env bash
 
-nome_() {
+gnome_() {
+# create config
   gsettings set org.gnome.desktop.interface show-battery-percentage true
   gsettings set org.gnome.desktop.peripherals.touchpad tap-to-click true
   gsettings set org.gnome.desktop.peripherals.touchpad two-finger-scrolling-enabled true

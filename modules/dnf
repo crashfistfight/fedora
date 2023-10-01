@@ -10,8 +10,10 @@ dnf_(){
 
 # install packages
   local core_packages=(
-    "dnf-automatic"
-    "htop"
+    'dnf-automatic'
+    'htop'
+    'wget'
+    'bash-completion'
   )
 
   dnf install --assumeyes "${core_packages[@]}"
@@ -20,7 +22,12 @@ dnf_(){
     dnf install --assumeyes "${default_packages[@]}"
   fi
 
+  if [[ -n "$packages" ]]; then
+    dnf install --assumeyes "${packages[@]}"
+  fi
+
 # auto update packages
+  sed --in-place "s@^upgrade_type = .*@upgrade_type = ${update_type:=security}@" /etc/dnf/automatic.conf
   sed --in-place "s@^apply_updates = .*@apply_updates = yes@" /etc/dnf/automatic.conf
 
   systemctl daemon-reload
