@@ -85,6 +85,10 @@ remote-control:
     control-enable: no
 EOF
 
+  tee --append /etc/systemd/resolved.conf > /dev/null <<EOF
+DNSStubListener=no
+EOF
+
 # enable
   systemctl enable --now unbound.service firewalld.service
   firewall-cmd --add-port={53/tcp,53/udp} --permanent --quiet
