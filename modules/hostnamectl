@@ -2,7 +2,7 @@
 
 hostnamectl_(){
 # set hostname
-  hostnamectl hostname "$(basename "$0")"
+  hostnamectl set-hostname "$(basename "$0")"
 }
 
 hostnamectl_
