@@ -1,0 +1,24 @@
+#! /usr/bin/env bash
+
+# shellcheck disable=SC2034
+# shellcheck source=/dev/null
+
+server_() {
+# set vars
+  ssh_auth_keys=('ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJUESoA/Z+r3a3yAT46p7k9b7Jq04BVsvz9vHG4tqan1 rico@x395')
+
+# load modules
+  server_modules=(
+    'hostnamectl'
+    'bash_prompt'
+    'dnf'
+    'vim'
+    'msmtp'
+    )
+
+  for i in "${server_modules[@]}"; do
+    source "$PWD"/../modules/"$i"
+  done
+}
+
+server_
