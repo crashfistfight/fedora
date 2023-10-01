@@ -1,0 +1,43 @@
+#! /usr/bin/env bash
+
+pihole_(){
+# install packages
+  local packages=(
+    'openssl'
+    'firewalld'
+  )
+
+  dnf install --assumeyes "${packages[@]}"
+
+# create config
+  mkdir /etc/pihole
+  tee /etc/pihole/setupVars.conf > /dev/null <<EOF
+INSTALL_WEB_SERVER=true
+INSTALL_WEB_INTERFACE=true
+LIGHTTPD_ENABLED=true
+CACHE_SIZE=10000
+DNS_FQDN_REQUIRED=true
+DNS_BOGUS_PRIV=true
+DNSMASQ_LISTENING=local
+WEBPASSWORD=(openssl rand -base64 48)
+BLOCKING_ENABLED=true
+PIHOLE_DNS_1=1.1.1.1
+PIHOLE_DNS_2=1.0.0.1
+PIHOLE_DNS_3=2606:4700:4700::1111
+PIHOLE_DNS_4=2606:4700:4700::1001
+DNSSEC=false
+REV_SERVER=false
+EOF
+
+# install
+  bash <(curl -fsSL https://install.pi-hole.net) --unattended
+
+# enable
+  systemctl enable --now firewalld.service
+  firewall-cmd --add-port=53/tcp --permanent --quiet
+  firewall-cmd --add-port=53/udp --permanent --quiet
+  firewall-cmd --add-port=80/tcp --permanent --quiet
+  firewall-cmd --reload
+}
+
+pihole_

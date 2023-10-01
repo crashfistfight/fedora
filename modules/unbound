@@ -1,0 +1,96 @@
+#! /usr/bin/env bash
+
+unbound_() {
+# install packages
+  local packages=(
+    'unbound'
+    'firewalld'
+  )
+
+  dnf install --assumeyes "${packages[@]}"
+
+# create config
+tee /etc/unbound/unbound.conf > /dev/null <<EOF
+server:
+    cache-max-ttl: 86400
+    cache-min-ttl: 300
+    directory: "/etc/unbound"
+    edns-buffer-size: 1472
+    interface: 0.0.0.0@853
+    interface: 0.0.0.0@443
+    interface: 0.0.0.0@53
+    tls-service-key: ""
+    tls-service-pem: ""
+    tls-port: 853
+    https-port: 443
+    port: 53
+    rrset-roundrobin: yes
+    username: "unbound"
+    do-ip4: yes
+    do-udp: yes
+    do-tcp: yes
+    do-ip6: no
+    prefer-ip6: no
+    log-local-actions: no
+    log-queries: no
+    log-replies: no
+    log-servfail: no
+    logfile: /dev/null
+    verbosity: 0
+    aggressive-nsec: yes
+    delay-close: 10000
+    do-daemonize: no
+    do-not-query-localhost: no
+    neg-cache-size: 4M
+    qname-minimisation: yes
+    access-control: 0.0.0.0/0 allow 
+    auto-trust-anchor-file: "/var/lib/unbound/root.key"
+    chroot: ""
+    deny-any: yes
+    harden-algo-downgrade: yes
+    harden-below-nxdomain: yes
+    harden-dnssec-stripped: yes
+    harden-glue: yes
+    harden-large-queries: yes
+    harden-referral-path: no
+    harden-short-bufsize: yes
+    hide-identity: yes
+    hide-version: yes
+    identity: "DNS"
+    private-address: 10.0.0.0/8
+    private-address: 172.16.0.0/12
+    private-address: 192.168.0.0/16
+    private-address: 169.254.0.0/16
+    ratelimit: 1000
+    unwanted-reply-threshold: 10000
+    use-caps-for-id: yes
+    val-clean-additional: yes
+    infra-cache-slabs: 4
+    key-cache-slabs: 4
+    msg-cache-size: 128525653
+    msg-cache-slabs: 4
+    num-queries-per-thread: 4096
+    num-threads: 4
+    outgoing-range: 8192
+    rrset-cache-size: 257051306
+    rrset-cache-slabs: 4
+    minimal-responses: yes
+    prefetch: yes
+    prefetch-key: yes
+    serve-expired: yes
+    so-reuseport: yes
+    module-config: "respip validator iterator"
+
+remote-control:
+    control-enable: no
+EOF
+
+# enable
+  systemctl enable --now unbound.service firewalld.service
+  firewall-cmd --add-port={53/tcp,53/udp} --permanent --quiet
+  firewall-cmd --remove-service=ssh --permanent --quiet
+
+  firewall-cmd --reload --quiet
+}
+
+unbound_
