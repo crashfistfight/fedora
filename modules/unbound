@@ -29,7 +29,7 @@ server:
     do-ip4: yes
     do-udp: yes
     do-tcp: yes
-    do-ip6: no
+    do-ip6: yes
     prefer-ip6: no
     log-local-actions: no
     log-queries: no
