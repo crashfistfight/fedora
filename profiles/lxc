@@ -4,18 +4,10 @@
 # shellcheck source=/dev/null
 
 lxc_() {
-# set vars
-default_packages=(
-  'firewalld'
-  'bash-completion'
-)
-
 # load modules
   lxc_modules=(
     'hostnamectl'
-    'bash_prompt'
     'dnf'
-    'vim'
     )
 
   for i in "${lxc_modules[@]}"; do
