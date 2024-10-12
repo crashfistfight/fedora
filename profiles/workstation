@@ -17,6 +17,7 @@ packages=(
   'borgmatic'
   'android-tools'
   'kernel-tools'
+  'nautilus'
 )
 
 removals=(
