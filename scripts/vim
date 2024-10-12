@@ -1,0 +1,29 @@
+#! /usr/bin/env bash
+
+dnf install --assumeyes vim
+
+tee /etc/vimrc > /dev/null <<EOF
+set autoindent
+set autoread
+set autowrite
+set expandtab
+set hidden
+set ignorecase
+set incsearch
+set laststatus=2
+set linebreak
+set list listchars=tab:▸\ ,trail:·
+set nofoldenable
+set nojoinspaces
+set number
+set path+=**
+set printoptions=paper:A4,syntax:n,number:y
+set shiftwidth=4
+set showbreak=↪\
+set splitbelow
+set splitright
+set statusline=\(%n\)\ %<%.99f\ %y\ %w%m%r%=%-14.(%l,%c%V%)\ %P
+set tabstop=4
+set textwidth=120
+set wrapscan
+EOF

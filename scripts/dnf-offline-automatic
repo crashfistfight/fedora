@@ -1,0 +1,45 @@
+#! /usr/bin/env bash
+
+tee /etc/systemd/system/dnf-offline-automatic.service > /dev/null <<EOF
+[Unit]
+Description=Start automatic offline upgrades
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=10m
+StartLimitBurst=5
+
+[Service]
+Type=oneshot
+Restart=on-failure
+RestartSec=60s
+
+# refresh repo
+ExecStartPre=/usr/bin/pkcon refresh force
+
+# download updates
+ExecStart=-/usr/bin/pkcon update --only-download
+
+# prepare update
+ExecStart=-/usr/bin/pkcon offline-get-prepared
+
+# set magiclink
+ExecStartPost=-/usr/bin/pkcon offline-trigger
+EOF
+
+tee /etc/systemd/system/dnf-offline-automatic.timer > /dev/null <<EOF
+[Unit]
+Description=Timer for automatic offline upgrades
+Wants=network-online.target
+After=network-online.target
+
+[Timer]
+OnBootSec=1h
+OnUnitInactiveSec=1d
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+EOF
+
+systemctl enable dnf-offline-automatic.timer

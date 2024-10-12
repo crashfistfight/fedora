@@ -1,0 +1,82 @@
+#! /usr/bin/env bash
+
+# shellcheck disable=SC2034,SC1090
+
+scripts=(
+  'dnf-automatic'
+  'flatpak'
+  'snapper'
+  'vim'
+  'bash'
+)
+
+packages=(
+  'htop'
+  'syncthing'
+  'virt-manager'
+  'borgmatic'
+  'android-tools'
+  'kernel-tools'
+)
+
+removals=(
+  'gnome-boxes'
+  'gnome-clocks'
+  'gnome-characters'
+  'gnome-contacts'
+  'gnome-connections'
+  'gnome-font-viewer'
+  'gnome-software'
+  'gnome-logs'
+  'gnome-calendar'
+  'gnome-maps'
+  'gnome-tour'
+  'yelp'
+  'gnome-weather'
+  'gnome-text-editor'
+  'totem*'
+  'libreoffice*'
+  'rhythmbox'
+  'cheese'
+  'simple-scan'
+  'evince*'
+  'loupe'
+  'gnome-calculator'
+  'gnome-system-monitor'
+  'baobab'
+  'mediawriter'
+  'firefox'
+  'firefox-langpacks'
+)
+
+flatpaks=(
+  'com.yubico.yubioath'
+  'org.gimp.GIMP'
+  'org.signal.Signal'
+  'org.chromium.Chromium'
+  'com.bitwarden.desktop'
+  'com.visualstudio.code-oss'
+  'org.gnome.baobab'
+  'org.gnome.TextEditor'
+  'org.gnome.Evince'
+  'org.gnome.Calendar'
+  'org.gnome.Contacts'
+  'org.gnome.Logs'
+  'org.gnome.Loupe'
+  'org.gnome.Snapshot'
+  'org.gnome.Calculator'
+  'org.mozilla.firefox'
+  'org.freedesktop.Platform.ffmpeg-full/x86_64/24.08'
+  'org.gnome.Firmware'
+  'com.github.tchx84.Flatseal'
+  'org.gnome.World.PikaBackup'
+  'org.gnome.Totem'
+)
+
+dnf autoremove --assumeyes "${removals[@]}"
+dnf upgrade --assumeyes
+dnf install --assumeyes "${packages[@]}"
+
+for script in "${scripts[@]}"; do
+  source ../scripts/"$script"
+done

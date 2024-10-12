@@ -1,0 +1,7 @@
+#! /usr/bin/env bash
+
+dnf install --assumeyes dnf-automatic
+
+sed --in-place "s@^apply_updates = .*@apply_updates = yes@" /etc/dnf/automatic.conf
+
+systemctl enable dnf-automatic.timer

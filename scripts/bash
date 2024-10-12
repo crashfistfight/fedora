@@ -1,0 +1,7 @@
+#! /usr/bin/env bash
+
+tee /etc/profile.d/prompt.sh > /dev/null <<EOF
+#! /usr/bin/env bash
+
+export PS1="[\[\e[31m\]\u\[\e[m\]@\h] \[\e[01;31m\]:\[\e[m\]\[\e[01;31m\]:\[\e[m\] \W \[\e[01;31m\]>\[\e[m\] "
+EOF

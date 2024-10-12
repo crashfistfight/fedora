@@ -1,0 +1,38 @@
+#! /usr/bin/env bash
+
+# shellcheck disable=SC2154
+
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+flatpak install flathub --assumeyes --noninteractive --or-update "${flatpaks[@]}"
+
+tee /etc/systemd/system/flatpak-automatic.service > /dev/null <<EOF
+[Unit]
+Description=Service for flatpak-automatic
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+# https://github.com/ublue-os/config/issues/168
+ExecStart=/usr/bin/dbus-run-session /usr/bin/flatpak uninstall --unused --assumeyes --noninteractive --delete-data
+ExecStart=/usr/bin/dbus-run-session /usr/bin/flatpak update -assumeyes --noninteractive
+ExecStart=/usr/bin/dbus-run-session /usr/bin/flatpak repair
+Restart=on-failure
+RestartSec=60s
+EOF
+
+tee /etc/systemd/system/flatpak-automatic.timer > /dev/null <<EOF
+[Unit]
+Description=Trigger for flatpak-automatic.service
+
+[Timer]
+OnBootSec=1h
+OnUnitInactiveSec=1d
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+EOF
+
+systemctl enable flatpak-automatic.timer
