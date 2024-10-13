@@ -72,6 +72,8 @@ flatpaks=(
   'com.github.tchx84.Flatseal'
   'org.gnome.World.PikaBackup'
   'org.gnome.Totem'
+  'net.nokyan.Resources'
+  'io.gitlab.adhami3310.Impression'
 )
 
 dnf autoremove --assumeyes "${removals[@]}"
