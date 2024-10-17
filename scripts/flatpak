@@ -15,7 +15,7 @@ After=network-online.target
 Type=oneshot
 # https://github.com/ublue-os/config/issues/168
 ExecStart=/usr/bin/dbus-run-session /usr/bin/flatpak uninstall --unused --assumeyes --noninteractive --delete-data
-ExecStart=/usr/bin/dbus-run-session /usr/bin/flatpak update -assumeyes --noninteractive
+ExecStart=/usr/bin/dbus-run-session /usr/bin/flatpak update --assumeyes --noninteractive
 ExecStart=/usr/bin/dbus-run-session /usr/bin/flatpak repair
 Restart=on-failure
 RestartSec=60s
